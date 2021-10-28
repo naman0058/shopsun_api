@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+        <title>Royal Palm Holidays</title>
+        <link href="/images/logo.png" rel="icon" type="image/png">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- MATERIAL DESIGN ICONIC FONT -->
+		<link rel="stylesheet" href="/indexdesign/fonts/material-design-iconic-font/css/material-design-iconic-font.min.css">
+		
+		<!-- STYLE CSS -->
+		<link rel="stylesheet" href="/indexdesign/css/style.css">
+	</head>
+
+	<body>
+
+		<div class="wrapper" style="background-image: url('/indexdesign/images/bg-registration-form-2.jpg');">
+			<div class="inner">
+				<form action="/enquiry-submit" method="post" >
+					<h3><%=msg%></h3>
+
+					
+						<div class="form-wrapper">
+							<label for="">Full Name</label>
+							<input type="text" name="name" class="form-control">
+						</div>
+					
+					
+					<div class="form-wrapper">
+						<label for="">Mobile Number</label>
+						<input type="text" name="number" class="form-control">
+					</div>
+					<div class="form-wrapper">
+						<label for="">Designation</label>
+						<input type="text" name="designation" class="form-control">
+					</div>
+					<div class="form-wrapper">
+						<label for="">Nationality</label>
+						<input type="text" name="nationality" class="form-control">
+					</div>
+                    <div class="form-wrapper">
+						<label for="">City of Residence</label>
+						<input type="text" name="city" class="form-control">
+					</div>
+                    	<div class="form-wrapper">
+						<label for="">Martial Status</label>
+						<!-- <input type="text" name="nationality" class="form-control"> -->
+                        <select name="status" class="form-control">
+                            <option value="married">Married</option>
+                            <option value="Unmarried">UnMarried</option>
+
+                        </select>
+					</div>
+					
+					<button>Register Now</button>
+				</form>
+			</div>
+		</div>
+		
+	</body><!-- This templates was made by Colorlib (https://colorlib.com) -->
+</html>
