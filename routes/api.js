@@ -40,8 +40,8 @@ router.get('/brands',(req,res)=>{
 
   router.get('/products',(req,res)=>{
     pool.query(`select p.* ,
-  (select c.quantity from cart c where c.product_id = p.id and c.user_id = '${req.query.user_id}'  ) as userquantity
-   from products p where subcategory_id = '${req.query.id}'`,(err,result)=>{
+  (select c.quantity from carts c where c.product_id = p.id and c.user_id = '${req.query.user_id}'  ) as userquantity
+   from products p where sub_category_id = '${req.query.id}'`,(err,result)=>{
       if(err) throw err;
       else res.json(result)
     })
@@ -148,7 +148,7 @@ router.get('/get-single-profile',(req,res)=>{
 
 router.post('/update-profile', (req, res) => {
   console.log(req.body)
-  pool.query(`update users set ? where id = ?`, [req.body, req.body.user_id], (err, result) => {
+  pool.query(`update users set ? where id = ?`, [req.body, req.body.id], (err, result) => {
       if(err) {
           res.json({
               status:500,
