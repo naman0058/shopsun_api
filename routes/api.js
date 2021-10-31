@@ -51,7 +51,13 @@ router.get('/brands',(req,res)=>{
 
   router.get('/myproduct',(req,res)=>{
     pool.query(`select u.* , 
-    (select w.payment_method from wallets w where w.id = u.wallet_id ) as payment_method_detail
+    (select w.payment_method from wallets w where w.id = u.wallet_id ) as payment_method_detail,
+    (select w.amount from wallets w where w.id = u.wallet_id ) as product_amount,
+    (select w.quantity from wallets w where w.id = u.wallet_id ) as product_quantity,
+    (select w.created_at from wallets w where w.id = u.wallet_id ) as product_date,
+   (select p.productname from products p where p.id  = (select w.product_id from wallets w where w.id = u.wallet_id) ) as productname,
+    (select p.image from products p where p.id  = (select w.product_id from wallets w where w.id = u.wallet_id) ) as productimage,
+    (select p.rating from product_user_ratings p where p.product_id  = (select w.product_id from wallets w where w.id = u.wallet_id ) ) as productrating
     from users_wallet u where u.user_id = '${req.query.user_id}'`,(err,result)=>{
       if(err) throw err;
       else res.json(result)
@@ -60,11 +66,157 @@ router.get('/brands',(req,res)=>{
 
 
   router.get('/single-product',(req,res)=>{
-    pool.query(`select * from wallets where id = '${req.query.id}'`,(err,result)=>{
+    pool.query(`select w.*,
+    (select p.productname from products p where p.id  = w.product_id ) as productname,
+    (select p.image from products p where p.id  = w.product_id ) as productimage,
+    (select r.rating from product_user_ratings r where r.id = w.wallet_id) as productrating
+    from wallets w where w.id = '${req.query.id}'`,(err,result)=>{
       if(err) throw err;
       else res.json(result)
     })
   })
+
+
+  router.get('/brand-product',(req,res)=>{
+    pool.query(`select p.* ,
+    (select c.quantity from carts c where c.product_id = p.id and c.user_id = '${req.query.user_id}'  ) as userquantity
+     from products p where brand_id = '${req.query.id}'`,(err,result)=>{
+        if(err) throw err;
+        else res.json(result)
+     })
+  })
+
+
+  router.get('/sliders',(req,res)=>{
+    pool.query(`select * from sliders order by id desc`,(err,result)=>{
+      if(err) throw err;
+      else res.json(result)
+    })
+  })
+
+
+  router.get('/search',(req,res)=>{
+    pool.query(`select p.* ,
+    (select c.quantity from carts c where c.product_id = p.id and c.user_id = '${req.query.user_id}'  ) as userquantity
+     from products p where keyword Like '%${req.query.search}%'`,(err,result)=>{
+        if(err) throw err;
+        else res.json(result)
+    })
+})
+
+
+router.post('/add-review',(req,res)=>{
+  let body = req.body;
+  pool.query(`insert into product_user_ratings set ?`,body,(err,result)=>{
+    if(err) throw err;
+    else res.json({
+      msg : 'success'
+    })
+  })
+})
+
+
+
+router.get('/all-review',(req,res)=>{
+  pool.query(`select r.* ,
+              (select u.name from users u where u.id = r.user_id) as username
+              from product_user_ratings r where product_id = '${req.query.product_id}' order by id desc`,(err,result)=>{
+                if(err) throw err;
+                else res.json(result);
+              })
+})
+
+
+
+router.post("/cart-handler", (req, res) => {
+  let body = req.body
+  console.log(req.body)
+  if (req.body.quantity == "0" || req.body.quantity == 0) {
+  pool.query(`delete from carts where product_id = '${req.body.product_id}' and  user_id = '${req.body.user_id}'`,(err,result)=>{
+      if (err) throw err;
+      else {
+        res.json({
+          msg: "updated sucessfully",
+        });
+      }
+  })
+  }
+  else {
+      pool.query(`select oneprice from carts where product_id = '${req.body.product_id}'  and user_id = '${req.body.user_id}' `,(err,result)=>{
+          if (err) throw err;
+          else if (result[0]) {
+             // res.json(result[0])
+              pool.query(`update carts set quantity = ${req.body.quantity} ,  where product_id = '${req.body.product_id}'  and user_id = '${req.body.user_id}'`,(err,result)=>{
+                  if (err) throw err;
+                  else {
+                      res.json({
+                        msg: "updated sucessfully",
+                      });
+                    }
+
+              })
+          }
+          else {
+               pool.query(`insert into cart set ?`, body, (err, result) => {
+               if (err) throw err;
+               else {
+                 res.json({
+                   msg: "updated sucessfully",
+                 });
+               }
+             });
+
+          }
+
+      })
+  }
+
+})
+
+
+
+router.post("/mycart", (req, res) => {
+ 
+  var query = `select c.*,(select s.productname from products s where s.id = c.product_id) as servicename
+  ,(select s.image from products s where s.id = c.product_id) as productlogo,
+  (select s.qty from products s where s.id = c.product_id) as productquantity
+  from carts c where c.user_id = '${req.body.user_id}';`
+  var query1 = `select count(id) as counter from carts where user_id = '${req.body.user_id}';`
+  var query3 = `select c.*,(select s.productname from products s where s.id = c.product_id) as servicename
+  ,(select s.image from products s where s.id = c.product_id) as productlogo,
+  (select s.qty from products s where s.id = c.product_id) as productquantity
+  from carts c where c.quantity <= (select p.qty from products p where p.id = c.product_id ) and c.user_id = '${req.body.user_id}' ;`
+  var query4 = `select count(id) as counter from carts c where c.quantity <= (select p.qty from products p where p.id = c.product_id ) and c.user_id = '${req.body.user_id}';`
+  pool.query(query+query1+query3+query4, (err, result) => {
+    if (err) throw err;
+    else if (result[0][0]) {
+      req.body.mobilecounter = result[1][0].counter;
+      console.log("MobileCounter", req.body.mobilecounter);
+      res.json(result);
+    } else
+      res.json({
+        msg: "empty cart",
+      });
+  });
+
+});
+
+
+router.get('/cities',(req,res)=>{
+  pool.query(`select * from cities where state_id = '${req.query.state_id}' order by name`,(err,result)=>{
+    if(err) throw err;
+     else res.json(result)
+  })
+})
+
+
+router.get('/states',(req,res)=>{
+  pool.query(`select * from states order by name`,(err,result)=>{
+    if(err) throw err;
+     else res.json(result)
+  })
+})
+
 
 
 
