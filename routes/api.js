@@ -179,12 +179,15 @@ router.post("/mycart", (req, res) => {
  
   var query = `select c.*,(select s.productname from products s where s.id = c.product_id) as servicename
   ,(select s.image from products s where s.id = c.product_id) as productlogo,
-  (select s.qty from products s where s.id = c.product_id) as productquantity
+  (select s.qty from products s where s.id = c.product_id) as productquantity,
+  (select s.mrp from products s where s.id = c.product_id) as productprice
+
   from carts c where c.user_id = '${req.body.user_id}';`
   var query1 = `select count(id) as counter from carts where user_id = '${req.body.user_id}';`
   var query3 = `select c.*,(select s.productname from products s where s.id = c.product_id) as servicename
   ,(select s.image from products s where s.id = c.product_id) as productlogo,
-  (select s.qty from products s where s.id = c.product_id) as productquantity
+  (select s.qty from products s where s.id = c.product_id) as productquantity,
+  (select s.mrp from products s where s.id = c.product_id) as productprice
   from carts c where c.quantity <= (select p.qty from products p where p.id = c.product_id ) and c.user_id = '${req.body.user_id}' ;`
   var query4 = `select count(id) as counter from carts c where c.quantity <= (select p.qty from products p where p.id = c.product_id ) and c.user_id = '${req.body.user_id}';`
   pool.query(query+query1+query3+query4, (err, result) => {
