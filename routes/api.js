@@ -142,7 +142,7 @@ router.post("/cart-handler", (req, res) => {
   })
   }
   else {
-      pool.query(`select oneprice from carts where product_id = '${req.body.product_id}'  and user_id = '${req.body.user_id}' `,(err,result)=>{
+      pool.query(`select quantity from carts where product_id = '${req.body.product_id}'  and user_id = '${req.body.user_id}' `,(err,result)=>{
           if (err) throw err;
           else if (result[0]) {
              // res.json(result[0])
