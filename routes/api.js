@@ -157,7 +157,7 @@ router.post("/cart-handler", (req, res) => {
               })
           }
           else {
-               pool.query(`insert into cart set ?`, body, (err, result) => {
+               pool.query(`insert into carts set ?`, body, (err, result) => {
                if (err) throw err;
                else {
                  res.json({
