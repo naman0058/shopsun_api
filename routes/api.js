@@ -47,6 +47,17 @@ router.get('/brands',(req,res)=>{
     })
   })
 
+
+
+  router.get('/products-detail',(req,res)=>{
+    pool.query(`select p.* ,
+  (select c.quantity from carts c where c.product_id = p.id and c.user_id = '${req.query.user_id}'  ) as userquantity
+   from products p where id = '${req.query.id}'`,(err,result)=>{
+      if(err) throw err;
+      else res.json(result)
+    })
+  })
+
   
 
   router.get('/myproduct',(req,res)=>{
