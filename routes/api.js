@@ -157,7 +157,7 @@ router.post("/cart-handler", (req, res) => {
           if (err) throw err;
           else if (result[0]) {
              // res.json(result[0])
-              pool.query(`update carts set quantity = ${req.body.quantity} ,  where product_id = '${req.body.product_id}'  and user_id = '${req.body.user_id}'`,(err,result)=>{
+              pool.query(`update carts set quantity = ${req.body.quantity} ,  where product_id = '${req.body.product_id}'  and user_id = ${req.body.user_id}`,(err,result)=>{
                   if (err) throw err;
                   else {
                       res.json({
