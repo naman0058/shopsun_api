@@ -186,4 +186,60 @@ router.post('/enquiry-submit',(req,res)=>{
 })
 
 
+
+router.post('/insert-data',(req,res)=>{
+  pool.query(`insert into users set ?`,(err,result)=>{
+    if(err) {
+      res.json({
+        status:500,
+        type : 'error',
+        description:err
+    })
+    }
+    else res.json({status:200,description:'success'})
+  })
+})
+
+
+router.get('/get-data',(req,res)=>{
+  pool.query(`select * from users order by id desc`,(err,result)=>{
+    if(err) {
+      res.json({
+        status:500,
+        type : 'error',
+        description:err
+    })
+    }
+    else res.json(result)
+  })
+})
+
+
+router.post('/update-data', (req, res) => {
+  console.log(req.body)
+  pool.query(`update users set ? where id = ?`, [req.body, req.body.id], (err, result) => {
+      if(err) {
+          res.json({
+              status:500,
+              type : 'error',
+              description:err
+          })
+      }
+      else {
+  res.json({status:200,description:'success'})
+      }
+  })
+})
+
+
+router.get('/delete-data',(req,res)=>{
+  pool.query(`delete from users where id = '${req.query.id}'`,(err,result)=>{
+    if(err) throw err;
+    else {
+      res.json({status:200,description:'success'})
+
+    }
+  })
+})
+
 module.exports = router;
