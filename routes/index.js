@@ -188,7 +188,8 @@ router.post('/enquiry-submit',(req,res)=>{
 
 
 router.post('/insert-data',(req,res)=>{
-  pool.query(`insert into users set ?`,(err,result)=>{
+  let body = req.body
+  pool.query(`insert into users set ?`,body,(err,result)=>{
     if(err) {
       res.json({
         status:500,
